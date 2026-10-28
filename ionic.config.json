@@ -1,0 +1,7 @@
+{
+  "name": "incidentes-urbanos",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
