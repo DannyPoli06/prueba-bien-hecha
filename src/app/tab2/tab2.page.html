@@ -1,15 +1,201 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title> Tab 2 </ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-custom">
+    <ion-title>
+      <div class="header-container">
+        <span class="app-subtitle">Municipio de Quito</span>
+        <h1 class="app-title">Incidencias Reportadas</h1>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="toggleFiltrosPanel()">
+        <ion-icon name="options-outline" [color]="mostrarFiltros() ? 'warning' : 'light'"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
+
+  <ion-toolbar class="search-toolbar">
+    <ion-searchbar 
+      placeholder="Buscar por sector, tipo o código..." 
+      [value]="textoBusqueda()"
+      (ionInput)="onBuscarInput($event)"
+      animated="true"
+      debounce="300">
+    </ion-searchbar>
+  </ion-toolbar>
+
+  <!-- PANEL DE FILTROS COLAPSABLE -->
+  <div *ngIf="mostrarFiltros()" class="filter-panel-box">
+    
+    <!-- Filtro por Estado -->
+    <div class="filter-group">
+      <span class="filter-title">Estado:</span>
+      <div class="chips-row">
+        <button 
+          type="button" 
+          class="f-chip" 
+          [class.active]="estadoFiltro() === ''"
+          (click)="setFiltroEstado('')">
+          Todos
+        </button>
+        <button 
+          type="button" 
+          class="f-chip chip-amber" 
+          [class.active]="estadoFiltro() === 'pendiente'"
+          (click)="setFiltroEstado('pendiente')">
+          Pendiente
+        </button>
+        <button 
+          type="button" 
+          class="f-chip chip-sky" 
+          [class.active]="estadoFiltro() === 'en proceso'"
+          (click)="setFiltroEstado('en proceso')">
+          En Proceso
+        </button>
+        <button 
+          type="button" 
+          class="f-chip chip-green" 
+          [class.active]="estadoFiltro() === 'resuelta'"
+          (click)="setFiltroEstado('resuelta')">
+          Resuelta
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtro por Prioridad -->
+    <div class="filter-group">
+      <span class="filter-title">Prioridad:</span>
+      <div class="chips-row">
+        <button 
+          type="button" 
+          class="f-chip" 
+          [class.active]="prioridadFiltro() === ''"
+          (click)="setFiltroPrioridad('')">
+          Todas
+        </button>
+        <button 
+          type="button" 
+          class="f-chip chip-rose" 
+          [class.active]="prioridadFiltro() === 'alta'"
+          (click)="setFiltroPrioridad('alta')">
+          Alta
+        </button>
+        <button 
+          type="button" 
+          class="f-chip chip-orange" 
+          [class.active]="prioridadFiltro() === 'media'"
+          (click)="setFiltroPrioridad('media')">
+          Media
+        </button>
+        <button 
+          type="button" 
+          class="f-chip chip-emerald" 
+          [class.active]="prioridadFiltro() === 'baja'"
+          (click)="setFiltroPrioridad('baja')">
+          Baja
+        </button>
+      </div>
+    </div>
+
+    <!-- Acciones de Filtro -->
+    <div class="filter-actions-row" *ngIf="estadoFiltro() || prioridadFiltro() || textoBusqueda()">
+      <button type="button" class="btn-clear-filters" (click)="limpiarFiltros()">
+        ✕ Limpiar Filtros
+      </button>
+    </div>
+
+  </div>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="bg-main">
+  <ion-refresher slot="fixed" (ionRefresh)="cargarPrimerosDatos($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+  <div class="content-container">
+
+    <!-- Indicador de Carga -->
+    <div *ngIf="cargando()" class="spinner-container">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Cargando registros remotos...</p>
+    </div>
+
+    <!-- Lista de Incidencias -->
+    <div *ngIf="!cargando()">
+      <div *ngIf="incidenciasFiltradas().length === 0" class="empty-state">
+        <ion-icon name="alert-circle-outline" class="empty-icon"></ion-icon>
+        <p>No se encontraron incidencias con los criterios seleccionados.</p>
+        <ion-button *ngIf="estadoFiltro() || prioridadFiltro() || textoBusqueda()" size="small" fill="outline" (click)="limpiarFiltros()">
+          Restablecer Filtros
+        </ion-button>
+      </div>
+
+      <ion-card *ngFor="let item of incidenciasFiltradas()" class="incidencia-card">
+        <ion-card-header>
+          <div class="card-header-top">
+            <!-- LADO IZQUIERDO: Badge de Estado -->
+            <div class="header-left">
+              <ion-badge [ngClass]="getClaseBadgeEstado(item.estado)" class="status-badge">
+                {{ (item.estado || 'pendiente') | uppercase }}
+              </ion-badge>
+            </div>
+
+            <!-- LADO DERECHO: Puntito + Prioridad + Bookmark -->
+            <div class="header-right">
+              <span class="priority-dot" [ngClass]="getColorPrioridad(item.prioridad)"></span>
+
+              <ion-badge [ngClass]="getClaseBadgePrioridad(item.prioridad)" class="priority-badge">
+                {{ (item.prioridad || 'media') | uppercase }}
+              </ion-badge>
+
+              <ion-button fill="clear" size="small" class="bookmark-btn" (click)="toggleSeguimiento(item.id)">
+                <ion-icon 
+                  [name]="esSeguido(item.id) ? 'bookmark' : 'bookmark-outline'" 
+                  [color]="esSeguido(item.id) ? 'primary' : 'medium'">
+                </ion-icon>
+              </ion-button>
+            </div>
+          </div>
+
+          <ion-card-title class="item-title">
+            {{ item.tipo | titlecase }} - {{ item.codigo || 'INC-000' }}
+          </ion-card-title>
+          <ion-card-subtitle class="item-location">
+            <ion-icon name="location-outline"></ion-icon>
+            {{ item.sector }}, {{ item.direccion }}
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <p class="description-text">{{ item.descripcion }}</p>
+
+          <!-- VISTA PREVIA DE FOTOGRAFÍA -->
+          <div class="card-photo-preview" *ngIf="item.fotografia">
+            <img [src]="item.fotografia" alt="Evidencia de la incidencia" />
+          </div>
+
+          <!-- Botón de acción con color sincronizado según estado -->
+          <div class="card-footer-action">
+            <ion-button 
+              expand="block" 
+              fill="outline" 
+              shape="round" 
+              size="small" 
+              [ngClass]="getClaseBotonEstado(item.estado)"
+              (click)="verDetalle(item.id)">
+              <ion-icon name="eye-outline" slot="start"></ion-icon>
+              {{ getTextoBotonEstado(item.estado) }}
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Scroll Infinito -->
+    <ion-infinite-scroll (ionInfinite)="cargarMasDatos($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="bubbles"
+        loadingText="Cargando más incidencias...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
 </ion-content>

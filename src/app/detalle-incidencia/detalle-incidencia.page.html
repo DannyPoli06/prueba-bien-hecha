@@ -1,0 +1,144 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab2" text="" color="light"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="header-container">
+        <span class="app-subtitle">Inspección Técnica</span>
+        <h1 class="app-title">Detalle del Caso</h1>
+      </div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-main">
+  <div class="content-container">
+
+    <!-- Loading Spinner -->
+    <div *ngIf="cargando()" class="spinner-container">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Cargando información del reporte...</p>
+    </div>
+
+    <div *ngIf="!cargando() && incidencia()" class="detalle-wrapper">
+
+      <!-- 1. Imagen / Fotografía Principal -->
+      <div class="photo-banner">
+        <img 
+          [src]="incidencia()?.fotografia || 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7'" 
+          alt="Foto de la incidencia" />
+        
+        <div class="photo-badges">
+          <ion-badge [color]="getColorEstado(incidencia()?.estado)" class="status-badge">
+            {{ incidencia()?.estado || 'pendiente' }}
+          </ion-badge>
+        </div>
+      </div>
+
+      <!-- 2. Tarjeta con Información General -->
+      <ion-card class="info-card">
+        <ion-card-content>
+          
+          <div class="code-row">
+            <span class="code-tag">{{ incidencia()?.codigo || 'INC-000' }}</span>
+            
+            <div class="priority-container">
+              <span class="priority-dot" [ngClass]="getColorPrioridad(incidencia()?.prioridad)"></span>
+              <ion-badge [ngClass]="getClaseBadgePrioridad(incidencia()?.prioridad)" class="priority-badge">
+                PRIORIDAD {{ (incidencia()?.prioridad || 'media') | uppercase }}
+              </ion-badge>
+            </div>
+          </div>
+
+          <h1 class="incidencia-title">{{ incidencia()?.tipo | titlecase }}</h1>
+
+          <div class="info-item">
+            <ion-icon name="location-outline" class="info-icon"></ion-icon>
+            <div>
+              <span class="info-label">SECTOR Y DIRECCIÓN</span>
+              <p class="info-val">{{ incidencia()?.sector }}, {{ incidencia()?.direccion }}</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <ion-icon name="map-outline" class="info-icon"></ion-icon>
+            <div>
+              <span class="info-label">COORDENADAS GPS</span>
+              <p class="info-val">Lat: {{ incidencia()?.latitud }} | Lng: {{ incidencia()?.longitud }}</p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <ion-icon name="time-outline" class="info-icon"></ion-icon>
+            <div>
+              <span class="info-label">FECHA DE REGISTRO</span>
+              <p class="info-val">{{ incidencia()?.fecha | date:'mediumDate' }}</p>
+            </div>
+          </div>
+
+          <div class="description-box">
+            <span class="info-label">DESCRIPCIÓN COMPLETA</span>
+            <p>{{ incidencia()?.descripcion }}</p>
+          </div>
+
+          <div class="description-box" *ngIf="incidencia()?.observacion">
+            <span class="info-label">OBSERVACIÓN DE RESOLUCIÓN</span>
+            <p class="observacion-texto">{{ incidencia()?.observacion }}</p>
+          </div>
+
+        </ion-card-content>
+      </ion-card>
+
+      <!-- 3. PANEL DE ACTUALIZACIÓN DE ESTADO -->
+      <div class="field-block">
+        <label class="label-clean">CAMBIAR ESTADO DE GESTIÓN</label>
+
+        <div class="status-actions-card">
+          <p class="sub-text">Selecciona un nuevo estado para actualizar el registro en tiempo real:</p>
+
+          <div class="buttons-grid">
+            
+            <button 
+              type="button" 
+              class="state-btn btn-pend" 
+              [class.active]="incidencia()?.estado === 'pendiente'"
+              [disabled]="guardandoEstado() || incidencia()?.estado === 'resuelta'"
+              (click)="intentarCambiarEstado('pendiente')">
+              <ion-icon name="time-outline"></ion-icon>
+              <span>Pendiente</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="state-btn btn-proc" 
+              [class.active]="incidencia()?.estado === 'en proceso'"
+              [disabled]="guardandoEstado() || incidencia()?.estado === 'resuelta'"
+              (click)="intentarCambiarEstado('en proceso')">
+              <ion-icon name="sync-outline"></ion-icon>
+              <span>En Proceso</span>
+            </button>
+
+            <button 
+              type="button" 
+              class="state-btn btn-resu" 
+              [class.active]="incidencia()?.estado === 'resuelta'"
+              [disabled]="guardandoEstado() || incidencia()?.estado === 'resuelta'"
+              (click)="intentarCambiarEstado('resuelta')">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <span>Resuelta</span>
+            </button>
+
+          </div>
+
+          <div *ngIf="guardandoEstado()" class="saving-loader">
+            <ion-spinner name="crescent" color="primary"></ion-spinner>
+            <span>Actualizando en el servidor...</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</ion-content>

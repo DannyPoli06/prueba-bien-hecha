@@ -1,0 +1,197 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-custom">
+    <ion-title>
+      <div class="header-container">
+        <span class="app-subtitle">Municipio de Quito</span>
+        <h1 class="app-title">Nuevo Reporte</h1>
+      </div>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" color="light" (click)="borrarBorrador()" title="Descartar Borrador">
+        <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bg-main">
+  <div class="form-wrapper">
+
+    <!-- Tarjeta de Cabecera Visual -->
+    <div class="form-header-card">
+      <div class="header-pill">Registro de Campo</div>
+      <h2>Levantamiento de Incidencia</h2>
+      <p>Completa la información técnica para el Municipio de Quito</p>
+    </div>
+
+    <form [formGroup]="formIncidencia" (ngSubmit)="guardarIncidencia()">
+
+      <!-- Código de Reporte -->
+      <div class="field-block">
+        <div class="label-row">
+          <label class="label-clean">CÓDIGO OFICIAL</label>
+          <span class="code-badge">{{ formIncidencia.get('codigo')?.value || 'INC-000' }}</span>
+        </div>
+      </div>
+
+      <!-- Tipo de Incidencia -->
+      <div class="field-block">
+        <label class="label-clean">TIPO DE INFRAESTRUCTURA *</label>
+        <div class="chips-selector">
+          <button 
+            type="button" 
+            *ngFor="let op of tiposOp" 
+            class="chip-btn" 
+            [class.active]="formIncidencia.get('tipo')?.value === op.value"
+            (click)="setTipo(op.value)">
+            {{ op.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Prioridad -->
+      <div class="field-block">
+        <label class="label-clean">NIVEL DE PRIORIDAD *</label>
+        <div class="chips-selector">
+          <button 
+            type="button" 
+            *ngFor="let op of prioridadesOp" 
+            class="chip-btn" 
+            [class.active]="formIncidencia.get('prioridad')?.value === op.value"
+            [ngClass]="'prio-' + op.color"
+            (click)="setPrioridad(op.value)">
+            {{ op.label }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Sector -->
+      <div class="field-block">
+        <label class="label-clean">SECTOR O BARRIO *</label>
+        <input class="modern-input" type="text" formControlName="sector" placeholder="Ej. La Carolina, Centro Histórico, Calderón" />
+      </div>
+
+      <!-- Dirección -->
+      <div class="field-block">
+        <label class="label-clean">
+          DIRECCIÓN EXACTA *
+          <span *ngIf="formIncidencia.get('tipo')?.value === 'bache'" class="req-text">(Requerida para baches)</span>
+        </label>
+        <input class="modern-input" type="text" formControlName="direccion" placeholder="Ej. Av. Amazonas y República" />
+      </div>
+
+      <!-- Descripción -->
+      <div class="field-block">
+        <label class="label-clean">DESCRIPCIÓN DEL DAÑO *</label>
+        <textarea class="modern-input textarea" formControlName="descripcion" rows="3" placeholder="Detalle las dimensiones, afectación al tránsito o riesgos..."></textarea>
+      </div>
+
+      <!-- Ubicación GPS -->
+      <div class="field-block">
+        <div class="gps-label-row">
+          <label class="label-clean margin-0">
+            COORDENADAS GPS
+            <span *ngIf="formIncidencia.get('tipo')?.value === 'bache'" class="req-text"> (Obligatorio en baches)</span>
+          </label>
+          <button type="button" class="gps-btn-auto" (click)="obtenerUbicacionGps()" [disabled]="obteniendoGps()">
+            <ion-icon name="navigate-outline"></ion-icon>
+            <span *ngIf="!obteniendoGps()">Capturar GPS</span>
+            <ion-spinner *ngIf="obteniendoGps()" name="crescent"></ion-spinner>
+          </button>
+        </div>
+
+        <div class="gps-card-box">
+          <div class="coords-inputs-row">
+            <div class="coord-input-box">
+              <span class="input-sub">Latitud</span>
+              <input class="modern-input coord-input" type="number" step="any" formControlName="latitud" placeholder="-0.180653" />
+            </div>
+            <div class="coord-input-box">
+              <span class="input-sub">Longitud</span>
+              <input class="modern-input coord-input" type="number" step="any" formControlName="longitud" placeholder="-78.467838" />
+            </div>
+          </div>
+          <small class="hint-text">Si el GPS está desactivado, ingresa manualmente las coordenadas.</small>
+        </div>
+      </div>
+
+      <!-- Condiciones Meteorológicas -->
+      <div class="field-block">
+        <div class="weather-label-row">
+          <label class="label-clean margin-0">SERVICIO METEOROLÓGICO</label>
+          <button type="button" class="weather-btn-refresh" (click)="refrescarClimaManual()" [disabled]="consultandoClima()">
+            <ion-icon name="cloud-outline"></ion-icon>
+            <span *ngIf="!consultandoClima()">Consultar Clima</span>
+            <ion-spinner *ngIf="consultandoClima()" name="crescent"></ion-spinner>
+          </button>
+        </div>
+
+        <div class="weather-card-box" [class.rain-alert-bg]="datosClima()?.advertenciaLluvia">
+          <div *ngIf="!datosClima()" class="weather-empty">
+            <ion-icon name="cloud-outline" class="weather-empty-icon"></ion-icon>
+            <small>Presiona "Consultar Clima" para leer Open-Meteo en tiempo real con las coordenadas.</small>
+          </div>
+
+          <div *ngIf="datosClima()" class="weather-content">
+            <div class="weather-top-row">
+              <div class="weather-val-block">
+                <span class="weather-temp">{{ datosClima()?.temperatura }}°C</span>
+                <span class="weather-sub">Temperatura</span>
+              </div>
+              <div class="weather-val-block">
+                <span class="weather-precip">{{ datosClima()?.precipitacion }} mm</span>
+                <span class="weather-sub">Lluvia última hora</span>
+              </div>
+              <span class="weather-cond-badge" [class.badge-rain]="datosClima()?.advertenciaLluvia">
+                {{ datosClima()?.condicion }}
+              </span>
+            </div>
+
+            <div *ngIf="datosClima()?.advertenciaLluvia" class="rain-alert-banner">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <span>ADVERTENCIA: Precipitación > 5 mm ({{ datosClima()?.precipitacion }} mm). Las condiciones meteorológicas podrían dificultar las labores de mantenimiento.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fotografía de Evidencia -->
+      <div class="field-block">
+        <div class="label-row">
+          <label class="label-clean">
+            EVIDENCIA FOTOGRÁFICA
+            <span *ngIf="formIncidencia.get('prioridad')?.value === 'alta'" class="req-text"> *(Obligatoria en Alta)</span>
+          </label>
+        </div>
+
+        <div class="photo-zone" (click)="tomarFotografia()">
+          <div *ngIf="!fotoPrevisualizacion()" class="photo-placeholder">
+            <div class="photo-icon-circle">
+              <ion-icon name="camera-outline"></ion-icon>
+            </div>
+            <span class="photo-main-text">Tomar Fotografía con la Cámara</span>
+            <span class="photo-sub-text">Toca para abrir la cámara del dispositivo</span>
+          </div>
+
+          <div *ngIf="fotoPrevisualizacion()" class="photo-preview-wrapper">
+            <img [src]="fotoPrevisualizacion()" alt="Evidencia capturada" />
+            <button type="button" class="btn-delete-photo" (click)="$event.stopPropagation(); fotoPrevisualizacion.set(null)">
+              ✕ Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botón de Envío -->
+      <div class="submit-box">
+        <button type="submit" class="primary-action-btn" [disabled]="enviando()">
+          <ion-spinner *ngIf="enviando()" name="crescent"></ion-spinner>
+          <span *ngIf="!enviando()">
+            <ion-icon name="send-outline" class="btn-icon"></ion-icon> PUBLICAR REPORTE
+          </span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</ion-content>

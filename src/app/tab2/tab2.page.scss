@@ -1,0 +1,301 @@
+.bg-main {
+  --background: #f8fafc;
+}
+
+// Encabezado con degradado azul a celeste idéntico a Tab 1
+.toolbar-custom {
+  --background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  --color: #ffffff;
+  padding-top: max(var(--ion-safe-area-top, 0px), 14px);
+  padding-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+
+  .header-container {
+    padding-left: 4px;
+
+    .app-subtitle {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.9);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .app-title {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+  }
+}
+
+.search-toolbar {
+  --background: #ffffff;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --border-width: 0;
+  border-bottom: 1px solid #e2e8f0;
+
+  ion-searchbar {
+    --background: #f1f5f9;
+    --border-radius: 12px;
+    --placeholder-color: #94a3b8;
+    --icon-color: #0284c7;
+    padding-top: 0;
+    padding-bottom: 8px;
+  }
+}
+
+// Panel de filtros interactivo
+.filter-panel-box {
+  background: #ffffff;
+  border-bottom: 1px solid #cbd5e1;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+
+  .filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .filter-title {
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #64748b;
+      min-width: 60px;
+      text-transform: uppercase;
+    }
+
+    .chips-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 2px 0;
+
+      .f-chip {
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        color: #475569;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &.active {
+          background: #0284c7;
+          border-color: #0284c7;
+          color: #ffffff;
+          box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+        }
+
+        &.chip-amber.active { background: #d97706; border-color: #d97706; }
+        &.chip-sky.active { background: #0284c7; border-color: #0284c7; }
+        &.chip-green.active { background: #059669; border-color: #059669; }
+
+        &.chip-rose.active { background: #e11d48; border-color: #e11d48; }
+        &.chip-orange.active { background: #ea580c; border-color: #ea580c; }
+        &.chip-emerald.active { background: #10b981; border-color: #10b981; }
+      }
+    }
+  }
+
+  .filter-actions-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2px;
+
+    .btn-clear-filters {
+      background: none;
+      border: none;
+      color: #e11d48;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+  }
+}
+
+.content-container {
+  padding: 14px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 16px;
+  color: #64748b;
+  font-size: 0.9rem;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+
+  .empty-icon {
+    font-size: 36px;
+    color: #94a3b8;
+    margin-bottom: 8px;
+  }
+
+  ion-button {
+    margin-top: 12px;
+  }
+}
+
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 0;
+  color: #64748b;
+}
+
+.incidencia-card {
+  margin: 0 0 16px 0;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+
+  ion-card-header {
+    padding: 14px 14px 8px 14px;
+  }
+
+  .card-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+
+      .status-badge {
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        padding: 4px 10px;
+        border-radius: 8px;
+      }
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .priority-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+
+        &.priority-high { background: #e11d48; }
+        &.priority-medium { background: #d97706; }
+        &.priority-low { background: #059669; }
+      }
+
+      .priority-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 3px 8px;
+        border-radius: 6px;
+      }
+
+      .bookmark-btn {
+        margin: 0;
+        --padding-start: 4px;
+        --padding-end: 4px;
+        height: 28px;
+        font-size: 1.1rem;
+      }
+    }
+  }
+
+  .item-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 4px 0 2px 0;
+  }
+
+  .item-location {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    ion-icon {
+      color: #0284c7;
+      font-size: 15px;
+    }
+  }
+
+  ion-card-content {
+    padding: 0 14px 14px 14px;
+
+    .description-text {
+      color: #334155;
+      font-size: 0.86rem;
+      line-height: 1.45;
+      margin: 6px 0 12px 0;
+    }
+
+    .card-photo-preview {
+      width: 100%;
+      height: 160px;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      background: #f1f5f9;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .card-footer-action {
+      ion-button {
+        --border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.78rem;
+        letter-spacing: 0.4px;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.badge-status-pendiente {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+}
+
+.badge-status-proceso {
+  background: #e0f2fe !important;
+  color: #0284c7 !important;
+}
+
+.badge-status-resuelta {
+  background: #d1fae5 !important;
+  color: #047857 !important;
+}
+
+.badge-p-high { background: #ffe4e6; color: #e11d48; }
+.badge-p-medium { background: #fef3c7; color: #d97706; }
+.badge-p-low { background: #d1fae5; color: #059669; }

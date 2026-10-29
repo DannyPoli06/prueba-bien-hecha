@@ -1,15 +1,87 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title> Tab 3 </ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-custom">
+    <ion-title>
+      <div class="header-container">
+        <span class="app-subtitle">Municipio de Quito</span>
+        <h1 class="app-title">Mi Seguimiento</h1>
+      </div>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 3</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="bg-main">
+  <ion-refresher slot="fixed" (ionRefresh)="cargarSeguimiento($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-  <app-explore-container name="Tab 3 page"></app-explore-container>
+  <div class="content-container">
+    
+    <!-- Spinner de carga -->
+    <div *ngIf="cargando()" class="spinner-container">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Leyendo almacenamiento local...</p>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!cargando() && incidenciasSeguidas().length === 0" class="empty-state">
+      <div class="empty-icon-box">
+        <ion-icon name="bookmark-sharp"></ion-icon>
+      </div>
+      <h3>Sin incidencias en seguimiento</h3>
+      <p>Marca el ícono de guardado en las incidencias del listado para conservarlas localmente en este dispositivo.</p>
+    </div>
+
+    <!-- Listado de Incidencias Guardadas -->
+    <div *ngIf="!cargando() && incidenciasSeguidas().length > 0">
+      <p class="count-header">MOSTRANDO {{ incidenciasSeguidas().length }} INCIDENCIAS GUARDADAS</p>
+
+      <ion-card *ngFor="let item of incidenciasSeguidas()" class="incidencia-card">
+        <ion-card-header>
+          <div class="card-header-top">
+            
+            <!-- Izquierda: Estado -->
+            <div class="header-left">
+              <ion-badge [color]="getColorEstado(item.estado)" class="status-badge">
+                {{ (item.estado || 'pendiente') | uppercase }}
+              </ion-badge>
+            </div>
+
+            <!-- Derecha: Puntito de color + Badge Prioridad + Botón Guardar -->
+            <div class="header-right">
+              <span class="priority-dot" [ngClass]="getColorPrioridad(item.prioridad)"></span>
+
+              <ion-badge [ngClass]="getClaseBadgePrioridad(item.prioridad)" class="priority-badge">
+                {{ (item.prioridad || 'media') | uppercase }}
+              </ion-badge>
+
+              <ion-button fill="clear" size="small" class="bookmark-btn" (click)="desmarcar(item.id)">
+                <ion-icon name="bookmark" color="primary"></ion-icon>
+              </ion-button>
+            </div>
+
+          </div>
+
+          <ion-card-title class="item-title">
+            {{ item.tipo | titlecase }} - {{ item.codigo || 'INC-000' }}
+          </ion-card-title>
+          <ion-card-subtitle class="item-location">
+            <ion-icon name="location-outline"></ion-icon>
+            {{ item.sector }}, {{ item.direccion }}
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <p class="description-text">{{ item.descripcion }}</p>
+
+          <div class="card-footer-action">
+            <ion-button expand="block" fill="outline" shape="round" size="small" (click)="verDetalle(item.id)">
+              <ion-icon name="eye-outline" slot="start"></ion-icon>
+              VER DETALLE
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+  </div>
 </ion-content>

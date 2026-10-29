@@ -1,0 +1,276 @@
+.bg-main {
+  --background: #f8fafc;
+}
+
+// Encabezado con degradado azul a celeste
+.toolbar-custom {
+  --background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  --color: #ffffff;
+  padding-top: max(var(--ion-safe-area-top, 0px), 14px);
+  padding-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+
+  .header-container {
+    padding-left: 4px;
+
+    .app-subtitle {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.9);
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .app-title {
+      margin: 0;
+      font-size: 1.4rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+    }
+  }
+}
+
+.content-container {
+  padding: 16px;
+  max-width: 600px;
+  margin: 0 auto;
+
+  .section-header {
+    margin-bottom: 16px;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 14px 16px;
+    border: 1px solid #e2e8f0;
+
+    h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    p {
+      margin: 3px 0 0 0;
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+  }
+}
+
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: #64748b;
+
+  p {
+    margin-top: 10px;
+    font-size: 0.85rem;
+  }
+}
+
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// Separadores de grupos
+.group-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #475569;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  padding-left: 4px;
+
+  ion-icon {
+    font-size: 16px;
+    color: #0284c7;
+  }
+}
+
+/* === SOLUCIÓN DE TAMAÑO Y ANCHO IDÉNTICO PARA AMBAS RETÍCULAS === */
+.grid-container {
+  padding: 0;
+  width: 100%;
+
+  ion-row {
+    margin: 0;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px;
+    width: 100%;
+  }
+
+  ion-col {
+    padding: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    display: flex;
+  }
+}
+
+// Tarjetas del Dashboard
+.dash-card {
+  margin: 0;
+  width: 100%;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  // Card Total Registros
+  &.card-total {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border: none;
+    box-shadow: 0 6px 18px rgba(2, 132, 199, 0.25);
+
+    ion-card-content {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 20px;
+    }
+
+    .card-icon-box {
+      background: rgba(255, 255, 255, 0.2);
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      ion-icon {
+        font-size: 26px;
+        color: #ffffff;
+      }
+    }
+
+    .card-info {
+      text-align: right;
+
+      .card-count {
+        color: #ffffff;
+        font-size: 2.2rem;
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      .card-label {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        display: block;
+        margin-top: 4px;
+      }
+    }
+  }
+
+  // Mini Cards de 3 columnas: EXACTAMENTE DEL MISMO PORTE
+  &.mini-card {
+    background: #ffffff;
+    min-height: 108px;
+    height: 108px;
+    display: flex;
+    flex-direction: column;
+
+    ion-card-content {
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100%;
+      box-sizing: border-box;
+    }
+
+    .mini-icon-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+      flex-shrink: 0;
+
+      ion-icon {
+        font-size: 18px;
+      }
+    }
+
+    .card-count {
+      font-size: 1.45rem;
+      font-weight: 900;
+      line-height: 1;
+      margin: 0;
+    }
+
+    .card-label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      color: #64748b;
+      margin-top: 4px;
+      line-height: 1;
+    }
+  }
+
+  // Colores específicos
+  &.card-pendientes {
+    border-top: 3.5px solid #d97706;
+    .icon-amber { background: #fef3c7; color: #d97706; }
+    .text-amber { color: #d97706; }
+  }
+
+  &.card-en-proceso {
+    border-top: 3.5px solid #0284c7;
+    .icon-sky { background: #e0f2fe; color: #0284c7; }
+    .text-sky { color: #0284c7; }
+  }
+
+  &.card-resueltas {
+    border-top: 3.5px solid #059669;
+    .icon-emerald { background: #d1fae5; color: #059669; }
+    .text-emerald { color: #059669; }
+  }
+
+  &.card-prio-alta {
+    border-top: 3.5px solid #e11d48;
+    .icon-rose { background: #ffe4e6; color: #e11d48; }
+    .text-rose { color: #e11d48; }
+  }
+
+  &.card-prio-media {
+    border-top: 3.5px solid #ea580c;
+    .icon-orange { background: #ffedd5; color: #ea580c; }
+    .text-orange { color: #ea580c; }
+  }
+
+  &.card-prio-baja {
+    border-top: 3.5px solid #10b981;
+    .icon-green { background: #dcfce7; color: #10b981; }
+    .text-green { color: #10b981; }
+  }
+}

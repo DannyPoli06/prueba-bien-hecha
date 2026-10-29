@@ -1,1 +1,30 @@
+ion-tab-bar {
+  --background: #0f172a; // Negro azulado elegante
+  --border: 1px solid #1e293b;
+  height: 62px;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
 
+  ion-tab-button {
+    --color: #94a3b8; // Gris claro inactivo
+    --color-selected: #38bdf8; // Celeste brillante activo
+    background: transparent;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+
+    ion-icon {
+      font-size: 23px;
+      margin-bottom: 3px;
+    }
+
+    &.tab-selected {
+      --color-selected: #38bdf8;
+      font-weight: 800;
+
+      ion-icon {
+        transform: scale(1.08);
+      }
+    }
+  }
+}

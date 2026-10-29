@@ -1,15 +1,144 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title> Tab 1 </ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar class="toolbar-custom">
+    <ion-title>
+      <div class="header-container">
+        <span class="app-subtitle">Municipio de Quito</span>
+        <h1 class="app-title">UrbanInspect</h1>
+      </div>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="bg-main">
+  <ion-refresher slot="fixed" (ionRefresh)="cargarDatos($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  <div class="content-container">
+    <div class="section-header">
+      <h2>Resumen de Gestión</h2>
+      <p>Indicadores en tiempo real de la infraestructura urbana</p>
+    </div>
+
+    <!-- Spinner de carga -->
+    <div *ngIf="cargando()" class="spinner-container">
+      <ion-spinner name="crescent" color="primary"></ion-spinner>
+      <p>Actualizando indicadores...</p>
+    </div>
+
+    <div *ngIf="!cargando()" class="dashboard-wrapper">
+      
+      <!-- Card Principal: Total de Registros -->
+      <ion-card class="dash-card card-total">
+        <ion-card-content>
+          <div class="card-icon-box icon-blue">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </div>
+          <div class="card-info">
+            <span class="card-count">{{ total() }}</span>
+            <span class="card-label">Total Registros</span>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- SECCIÓN 1: POR ESTADO DE GESTIÓN -->
+      <div class="group-title">
+        <ion-icon name="construct-outline"></ion-icon>
+        <span>Por Estado de Gestión</span>
+      </div>
+
+      <ion-grid class="grid-container">
+        <ion-row>
+          <!-- Pendientes -->
+          <ion-col size="4">
+            <ion-card class="dash-card mini-card card-pendientes">
+              <ion-card-content>
+                <div class="mini-icon-circle icon-amber">
+                  <ion-icon name="time-outline"></ion-icon>
+                </div>
+                <span class="card-count text-amber">{{ totalPendientes() }}</span>
+                <span class="card-label">Pendientes</span>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+
+          <!-- En Proceso -->
+          <ion-col size="4">
+            <ion-card class="dash-card mini-card card-en-proceso">
+              <ion-card-content>
+                <div class="mini-icon-circle icon-sky">
+                  <ion-icon name="construct-outline"></ion-icon>
+                </div>
+                <span class="card-count text-sky">{{ totalEnProceso() }}</span>
+                <span class="card-label">En Proceso</span>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+
+          <!-- Resueltas -->
+          <ion-col size="4">
+            <ion-card class="dash-card mini-card card-resueltas">
+              <ion-card-content>
+                <div class="mini-icon-circle icon-emerald">
+                  <ion-icon name="checkmark-circle-outline"></ion-icon>
+                </div>
+                <span class="card-count text-emerald">{{ totalResueltas() }}</span>
+                <span class="card-label">Resueltas</span>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <!-- SECCIÓN 2: POR NIVEL DE PRIORIDAD -->
+      <div class="group-title">
+        <ion-icon name="warning-outline"></ion-icon>
+        <span>Por Nivel de Prioridad</span>
+      </div>
+
+      <ion-grid class="grid-container">
+        <ion-row>
+          <!-- Alta -->
+          <ion-col size="4">
+            <ion-card class="dash-card mini-card card-prio-alta">
+              <ion-card-content>
+                <div class="mini-icon-circle icon-rose">
+                  <ion-icon name="flame-outline"></ion-icon>
+                </div>
+                <span class="card-count text-rose">{{ totalAlta() }}</span>
+                <span class="card-label">Alta</span>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+
+          <!-- Media -->
+          <ion-col size="4">
+            <ion-card class="dash-card mini-card card-prio-media">
+              <ion-card-content>
+                <div class="mini-icon-circle icon-orange">
+                  <ion-icon name="alert-circle-outline"></ion-icon>
+                </div>
+                <span class="card-count text-orange">{{ totalMedia() }}</span>
+                <span class="card-label">Media</span>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+
+          <!-- Baja -->
+          <ion-col size="4">
+            <ion-card class="dash-card mini-card card-prio-baja">
+              <ion-card-content>
+                <div class="mini-icon-circle icon-green">
+                  <ion-icon name="shield-checkmark-outline"></ion-icon>
+                </div>
+                <span class="card-count text-green">{{ totalBaja() }}</span>
+                <span class="card-label">Baja</span>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+    </div>
+  </div>
 </ion-content>
