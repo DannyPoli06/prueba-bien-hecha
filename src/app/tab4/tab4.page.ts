@@ -15,9 +15,11 @@ import {
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
 import { Preferences } from '@capacitor/preferences';
+import { firstValueFrom } from 'rxjs';
 
 import { IncidenciasService } from '../services/incidencias';
 import { WeatherService } from '../services/weather';
+import { CloudinaryService } from '../services/cloudinary';
 import { DatosClima, Incidencia } from '../models/incidencia.model';
 
 @Component({
@@ -34,6 +36,7 @@ export class Tab4Page implements OnInit {
   private fb = inject(FormBuilder);
   private incidenciasService = inject(IncidenciasService);
   private weatherService = inject(WeatherService);
+  private cloudinaryService = inject(CloudinaryService);
   private router = inject(Router);
   private toastCtrl = inject(ToastController);
   private alertCtrl = inject(AlertController);
@@ -229,7 +232,7 @@ export class Tab4Page implements OnInit {
 
   // R5, R6: Capturar fotografía nativa con manejo de permisos
   
-  // Comprime imagen DataURL a max 480px y jpeg 0.6 para no exceder los 70KB de MockAPI 
+  // Comprime imagen DataURL a max 480px y jpeg 0.6 para optimización previa
   private comprimirImagen(dataUrl: string): Promise<string> {
     return new Promise((resolve) => {
       const img = new Image();
@@ -256,7 +259,6 @@ export class Tab4Page implements OnInit {
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-          // 0.6 calidad genera fotos de 20KB-35KB, perfecto para MockAPI
           const compressed = canvas.toDataURL('image/jpeg', 0.6);
           resolve(compressed);
         } else {
@@ -380,7 +382,20 @@ export class Tab4Page implements OnInit {
     });
   }
 
-  // Guardar en MockAPI cumpliendo R4, R5, R6 y R7
+  // Método auxiliar para subir la imagen a Cloudinary
+  private async subirFotoCloudinary(base64DataUrl: string): Promise<string> {
+    try {
+      const urlPublica = await firstValueFrom(
+        this.cloudinaryService.subirImagen(base64DataUrl)
+      );
+      return urlPublica;
+    } catch (error) {
+      console.error('Error al subir imagen a Cloudinary:', error);
+      throw error;
+    }
+  }
+
+  // Guardar en MockAPI cumpliendo R4, R5, R6 y R7 + Cloudinary
   async guardarIncidencia() {
     const tipo = this.formIncidencia.get('tipo')?.value;
     const prioridad = this.formIncidencia.get('prioridad')?.value;
@@ -430,9 +445,20 @@ export class Tab4Page implements OnInit {
 
     this.enviando.set(true);
 
-    // Evidencia fotográfica persistente (si no se tomó foto para prioridad baja/media, usa una imagen de referencia urbana)
-    const fotoFinal = this.fotoPrevisualizacion() || 
-      'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7';
+    // Evidencia fotográfica por defecto
+    let fotoFinal = 'https://images.unsplash.com/photo-1515162816999-a0c47dc192f7';
+
+    // Subir a Cloudinary si se tomó foto
+    if (this.fotoPrevisualizacion()) {
+      try {
+        this.mostrarToast('Subiendo fotografía a Cloudinary...', 'medium');
+        fotoFinal = await this.subirFotoCloudinary(this.fotoPrevisualizacion()!);
+      } catch (err) {
+        this.enviando.set(false);
+        this.mostrarToast('Error al subir la fotografía a Cloudinary. Intenta nuevamente.', 'danger');
+        return;
+      }
+    }
 
     // Generar código único asegurado
     const codReporte = this.formIncidencia.value.codigo || `INC-${Math.floor(100 + Math.random() * 900)}`;
