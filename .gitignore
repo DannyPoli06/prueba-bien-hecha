@@ -23,6 +23,10 @@ log.txt
 /platforms
 /plugins
 
+# Firebase
+/.firebase
+/users.json
+
 # Compiled output
 /dist
 /tmp

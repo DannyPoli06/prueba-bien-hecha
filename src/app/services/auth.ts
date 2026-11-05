@@ -1,4 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { 
   getAuth, 
@@ -15,6 +16,7 @@ export interface UserProfile {
   uid: string;
   email: string;
   nombre?: string;
+  esFirebaseReal?: boolean;
 }
 
 @Injectable({
@@ -24,21 +26,20 @@ export class AuthService {
   private app: FirebaseApp;
   private auth: Auth;
 
-  // Estado del usuario activo reactivo
+  // Estado del usuario activo
   currentUser = signal<UserProfile | null>(null);
   isLoggedIn = computed(() => !!this.currentUser());
 
-  constructor() {
-    // Inicializar Firebase
+  constructor(private router: Router) {
     this.app = getApps().length ? getApp() : initializeApp(environment.firebase);
     this.auth = getAuth(this.app);
 
-    // Revisar si habia sesión guardada localmente
+    // Recuperar sesion guardada si existe
     const savedUser = localStorage.getItem('usuario_sesion');
     if (savedUser) {
       try {
         this.currentUser.set(JSON.parse(savedUser));
-      } catch (e) {
+      } catch {
         localStorage.removeItem('usuario_sesion');
       }
     }
@@ -48,37 +49,36 @@ export class AuthService {
       if (user) {
         const perfil: UserProfile = {
           uid: user.uid,
-          email: user.email || 'usuario@correo.com',
-          nombre: user.displayName || user.email?.split('@')[0] || 'Usuario'
+          email: user.email || '',
+          nombre: user.displayName || user.email?.split('@')[0] || 'Usuario',
+          esFirebaseReal: true
         };
         this.currentUser.set(perfil);
         localStorage.setItem('usuario_sesion', JSON.stringify(perfil));
-      } else if (!savedUser) {
-        this.currentUser.set(null);
-        localStorage.removeItem('usuario_sesion');
       }
     });
   }
 
-  // Iniciar sesion
+  // Iniciar sesion con correo y contraseña
   async login(email: string, pass: string): Promise<void> {
     try {
       const cred = await signInWithEmailAndPassword(this.auth, email, pass);
       const perfil: UserProfile = {
         uid: cred.user.uid,
         email: cred.user.email || email,
-        nombre: cred.user.displayName || email.split('@')[0]
+        nombre: cred.user.displayName || email.split('@')[0],
+        esFirebaseReal: true
       };
       this.currentUser.set(perfil);
       localStorage.setItem('usuario_sesion', JSON.stringify(perfil));
     } catch (error: any) {
-      // Manejo amigable de errores de Firebase
-      if (error?.code === 'auth/api-key-not-valid' || error?.code === 'auth/invalid-api-key') {
-        // En caso de que aun no reemplace la API key real del proyecto incidencias-LOGIN
+      // Si la consola de Firebase aun no activo el proveedor de Correo
+      if (error?.code === 'auth/configuration-not-found') {
         const perfil: UserProfile = {
-          uid: 'demo-' + Date.now(),
+          uid: 'local-' + Date.now().toString(36),
           email: email,
-          nombre: email.split('@')[0]
+          nombre: email.split('@')[0],
+          esFirebaseReal: false
         };
         this.currentUser.set(perfil);
         localStorage.setItem('usuario_sesion', JSON.stringify(perfil));
@@ -88,23 +88,26 @@ export class AuthService {
     }
   }
 
-  // Registro de nuevo usuario
+  // Registrar un nuevo usuario en Firebase Auth
   async register(email: string, pass: string): Promise<void> {
     try {
       const cred = await createUserWithEmailAndPassword(this.auth, email, pass);
       const perfil: UserProfile = {
         uid: cred.user.uid,
         email: cred.user.email || email,
-        nombre: cred.user.displayName || email.split('@')[0]
+        nombre: cred.user.displayName || email.split('@')[0],
+        esFirebaseReal: true
       };
       this.currentUser.set(perfil);
       localStorage.setItem('usuario_sesion', JSON.stringify(perfil));
     } catch (error: any) {
-      if (error?.code === 'auth/api-key-not-valid' || error?.code === 'auth/invalid-api-key') {
+      // Si la consola de Firebase aun no activo el proveedor de Correo
+      if (error?.code === 'auth/configuration-not-found') {
         const perfil: UserProfile = {
-          uid: 'demo-' + Date.now(),
+          uid: 'local-' + Date.now().toString(36),
           email: email,
-          nombre: email.split('@')[0]
+          nombre: email.split('@')[0],
+          esFirebaseReal: false
         };
         this.currentUser.set(perfil);
         localStorage.setItem('usuario_sesion', JSON.stringify(perfil));
@@ -114,14 +117,15 @@ export class AuthService {
     }
   }
 
-  // Cerrar sesion
+  // Cerrar sesion y redirigir al login
   async logout(): Promise<void> {
     try {
       await signOut(this.auth);
-    } catch (e) {
-      // Si falla signOut de firebase, igual limpiamos el estado local
+    } catch {
+      // Limpieza garantizada
     }
     this.currentUser.set(null);
     localStorage.removeItem('usuario_sesion');
+    this.router.navigate(['/login']);
   }
 }

@@ -4,15 +4,17 @@ import { RouterModule } from '@angular/router';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, 
   IonRow, IonCol, IonCard, IonCardContent, IonIcon, 
-  IonSpinner, IonRefresher, IonRefresherContent 
+  IonSpinner, IonRefresher, IonRefresherContent,
+  IonButtons, IonButton
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { 
   documentTextOutline, warningOutline, timeOutline, 
   constructOutline, checkmarkCircleOutline, alertCircleOutline,
-  shieldCheckmarkOutline, flameOutline
+  shieldCheckmarkOutline, flameOutline, logOutOutline
 } from 'ionicons/icons';
 import { IncidenciasService } from '../services/incidencias';
+import { AuthService } from '../services/auth';
 import { Incidencia } from '../models/incidencia.model';
 
 @Component({
@@ -23,11 +25,13 @@ import { Incidencia } from '../models/incidencia.model';
   imports: [
     CommonModule, RouterModule, IonHeader, IonToolbar, IonTitle, IonContent, 
     IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonIcon, 
-    IonSpinner, IonRefresher, IonRefresherContent
+    IonSpinner, IonRefresher, IonRefresherContent,
+    IonButtons, IonButton
   ],
 })
 export class Tab1Page implements OnInit {
   private incidenciasService = inject(IncidenciasService);
+  private authService = inject(AuthService);
 
   cargando = signal<boolean>(true);
   total = signal<number>(0);
@@ -51,8 +55,13 @@ export class Tab1Page implements OnInit {
       checkmarkCircleOutline,
       alertCircleOutline,
       shieldCheckmarkOutline,
-      flameOutline
+      flameOutline,
+      logOutOutline
     });
+  }
+
+  async cerrarSesion() {
+    await this.authService.logout();
   }
 
   ngOnInit() {

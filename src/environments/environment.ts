@@ -1,11 +1,11 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: "AIzaSyFakeKeyForLocalTestingOrReplaceWithYours",
-    authDomain: "incidencias-login.firebaseapp.com",
     projectId: "incidencias-login",
-    storageBucket: "incidencias-login.appspot.com",
-    messagingSenderId: "100000000000",
-    appId: "1:100000000000:web:abcdef123456"
+    appId: "1:1046868144945:web:ffeffdb6f7fa62f625b610",
+    storageBucket: "incidencias-login.firebasestorage.app",
+    apiKey: "AIzaSyAMau43BnYXJAyBMJLVWhoP52NOSfePlSw",
+    authDomain: "incidencias-login.firebaseapp.com",
+    messagingSenderId: "1046868144945"
   }
 };

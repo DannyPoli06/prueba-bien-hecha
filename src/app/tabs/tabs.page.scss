@@ -1,12 +1,12 @@
 ion-tab-bar {
-  --background: #0f172a; // Negro azulado elegante
+  --background: #0f172a;
   --border: 1px solid #1e293b;
   height: 62px;
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.25);
 
   ion-tab-button {
-    --color: #94a3b8; // Gris claro inactivo
-    --color-selected: #38bdf8; // Celeste brillante activo
+    --color: #94a3b8;
+    --color-selected: #38bdf8;
     background: transparent;
     font-size: 0.74rem;
     font-weight: 700;
@@ -24,35 +24,6 @@ ion-tab-bar {
 
       ion-icon {
         transform: scale(1.08);
-      }
-    }
-
-    // Boton de Login resaltado en color ROJO para diferenciarlo
-    &.tab-login {
-      --color: #f87171;
-      --color-selected: #ef4444;
-
-      ion-icon {
-        color: #ef4444;
-      }
-
-      ion-label {
-        color: #f87171;
-      }
-
-      &.tab-selected {
-        --color-selected: #ef4444;
-
-        ion-label {
-          color: #ef4444;
-          font-weight: 900;
-        }
-
-        ion-icon {
-          color: #ef4444;
-          transform: scale(1.15);
-          filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6));
-        }
       }
     }
   }
