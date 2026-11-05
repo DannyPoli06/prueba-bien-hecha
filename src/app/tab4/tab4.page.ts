@@ -269,7 +269,7 @@ export class Tab4Page implements OnInit {
     });
   }
 
-  async tomarFotografia() {
+async tomarFotografia() {
     try {
       const image = await Camera.getPhoto({
         quality: 50,
@@ -278,18 +278,15 @@ export class Tab4Page implements OnInit {
         source: CameraSource.Camera
       });
       if (image && image.dataUrl) {
-        const fotoOptimizada = await this.comprimirImagen(image.dataUrl);
-        this.fotoPrevisualizacion.set(fotoOptimizada);
+        this.fotoPrevisualizacion.set(image.dataUrl);
         this.guardarBorrador(this.formIncidencia.value);
         this.mostrarToast('Fotografía capturada y optimizada para el servidor', 'success');
       }
     } catch (e: any) {
       const errStr = (e?.message || e?.toString() || '').toLowerCase();
-      // Si el usuario canceló la captura voluntariamente, los datos permanecen intactos 
       if (errStr.includes('cancel') || errStr.includes('user cancelled')) {
         console.log('Captura fotográfica cancelada por el usuario (datos intactos)');
       } else {
-        // Si el permiso fue denegado
         const alert = await this.alertCtrl.create({
           header: 'Permiso de Cámara Denegado',
           message: 'Se denegó el acceso a la cámara. Si la incidencia tiene Prioridad Alta, la fotografía es un requisito obligatorio para poder guardarla.',
