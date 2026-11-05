@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -48,9 +48,11 @@ export class LoginPage {
 
   email = '';
   password = '';
-  mostrarPassword = false;
-  cargando = false;
-  mensajeError = '';
+
+  // Reactividad con Signals para evitar bloqueos en la interfaz
+  mostrarPassword = signal<boolean>(false);
+  cargando = signal<boolean>(false);
+  mensajeError = signal<string>('');
 
   constructor() {
     addIcons({
@@ -66,33 +68,55 @@ export class LoginPage {
   }
 
   togglePassword() {
-    this.mostrarPassword = !this.mostrarPassword;
+    this.mostrarPassword.update((val) => !val);
   }
 
   async iniciarSesion() {
-    this.mensajeError = '';
+    this.mensajeError.set('');
 
-    if (!this.email.trim() || !this.password) {
-      this.mensajeError = 'Por favor ingresa tu correo y contraseña.';
+    const correoLimpio = (this.email || '').trim();
+    const claveLimpia = this.password || '';
+
+    // Validacion de campos vacios
+    if (!correoLimpio || !claveLimpia) {
+      this.mensajeError.set('Por favor ingresa tu correo y contraseña.');
+      this.mostrarToast('Por favor completa todos los campos', 'warning');
+      this.cargando.set(false);
       return;
     }
 
-    this.cargando = true;
+    // Validacion de formato de correo
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(correoLimpio)) {
+      this.mensajeError.set('El formato del correo electrónico no es válido.');
+      this.mostrarToast('Correo electrónico no válido', 'warning');
+      this.cargando.set(false);
+      return;
+    }
+
+    this.cargando.set(true);
+
     try {
-      await this.authService.login(this.email.trim(), this.password);
-      const toast = await this.toastCtrl.create({
-        message: 'Bienvenido a Reportes Quito',
-        duration: 2000,
-        color: 'success',
-        position: 'top'
-      });
-      await toast.present();
+      await this.authService.login(correoLimpio, claveLimpia);
+      this.mostrarToast('Bienvenido a Reportes Quito', 'success');
       this.router.navigate(['/tabs/tab1']);
     } catch (err: any) {
-      this.mensajeError = this.obtenerMensajeError(err?.code || err?.message);
+      const mensaje = this.obtenerMensajeError(err?.code || err?.message);
+      this.mensajeError.set(mensaje);
+      this.mostrarToast(mensaje, 'danger');
     } finally {
-      this.cargando = false;
+      this.cargando.set(false);
     }
+  }
+
+  private async mostrarToast(mensaje: string, color: string = 'danger') {
+    const toast = await this.toastCtrl.create({
+      message: mensaje,
+      duration: 2500,
+      position: 'top',
+      color: color
+    });
+    await toast.present();
   }
 
   private obtenerMensajeError(codigo: string): string {
@@ -102,7 +126,11 @@ export class LoginPage {
       case 'auth/user-not-found':
       case 'auth/wrong-password':
       case 'auth/invalid-credential':
-        return 'Credenciales incorrectas. Verifica correo o contraseña.';
+        return 'Credenciales incorrectas o usuario no registrado.';
+      case 'auth/too-many-requests':
+        return 'Demasiados intentos fallidos. Intenta más tarde.';
+      case 'auth/network-request-failed':
+        return 'Error de conexión. Revisa tu acceso a internet.';
       case 'auth/configuration-not-found':
         return 'Servicio de autenticación no habilitado en Firebase Console.';
       default:
