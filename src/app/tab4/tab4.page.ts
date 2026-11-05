@@ -51,7 +51,7 @@ export class Tab4Page implements OnInit {
   consultandoClima = signal<boolean>(false);
   fotoPrevisualizacion = signal<string | null>(null);
   
-  // R4: Inicializado estrictamente en NULL para que la caja empiece vacía
+  // Inicializado estrictamente en NULL para que la caja empiece vacía
   datosClima = signal<DatosClima | null>(null);
 
   tiposOp = [
@@ -125,7 +125,7 @@ export class Tab4Page implements OnInit {
     this.formIncidencia.patchValue({ prioridad: val });
   }
 
-  // R8: Al volver a abrir la pantalla, si hay borrador ofrecer CONTINUAR o DESCARTAR
+  //  Al volver a abrir la pantalla, si hay borrador ofrecer CONTINUAR o DESCARTAR
   async verificarBorradorAlIniciar() {
     const { value } = await Preferences.get({ key: this.BORRADOR_KEY });
     if (value) {
@@ -230,7 +230,6 @@ export class Tab4Page implements OnInit {
     this.mostrarToast('Formulario limpiado', 'medium');
   }
 
-  // R5, R6: Capturar fotografía nativa con manejo de permisos
   
   // Comprime imagen DataURL a max 480px y jpeg 0.6 para optimización previa
   private comprimirImagen(dataUrl: string): Promise<string> {
@@ -301,7 +300,7 @@ export class Tab4Page implements OnInit {
     }
   }
 
-  // R7: Capturar GPS con solicitud de permisos y soporte manual
+
   async obtenerUbicacionGps() {
     this.obteniendoGps.set(true);
     try {
@@ -341,7 +340,7 @@ export class Tab4Page implements OnInit {
     }
   }
 
-  // R4: Consulta meteorológica
+  // Consulta meteorológica
   refrescarClimaManual() {
     const lat = this.formIncidencia.get('latitud')?.value;
     const lng = this.formIncidencia.get('longitud')?.value;
@@ -395,7 +394,7 @@ export class Tab4Page implements OnInit {
     }
   }
 
-  // Guardar en MockAPI cumpliendo R4, R5, R6 y R7 + Cloudinary
+  // Guardar en MockAPI cumpliendo Cloudinary
   async guardarIncidencia() {
     const tipo = this.formIncidencia.get('tipo')?.value;
     const prioridad = this.formIncidencia.get('prioridad')?.value;
@@ -405,7 +404,7 @@ export class Tab4Page implements OnInit {
     const lat = this.formIncidencia.get('latitud')?.value;
     const lng = this.formIncidencia.get('longitud')?.value;
 
-    // Validación R7: Para tipo bache, la ubicación es obligatoria (GPS o manual válidas)
+    //  Para tipo bache, la ubicación es obligatoria (GPS o manual válidas)
     if (tipo === 'bache') {
       const tieneLat = lat !== null && lat !== '' && !isNaN(Number(lat));
       const tieneLng = lng !== null && lng !== '' && !isNaN(Number(lng));
@@ -420,7 +419,7 @@ export class Tab4Page implements OnInit {
       }
     }
 
-    // Validación R5 & R6: Para prioridad alta, se exige fotografía obligatoria
+    // Para prioridad alta, se exige fotografía obligatoria
     if (prioridad === 'alta' && !this.fotoPrevisualizacion()) {
       const alert = await this.alertCtrl.create({
         header: 'Fotografía Obligatoria',
@@ -437,7 +436,7 @@ export class Tab4Page implements OnInit {
       return;
     }
 
-    // Validación R4: Si hay coordenadas y aún no se ha consultado el clima, consultarlo antes de guardar
+    //  Si hay coordenadas y aún no se ha consultado el clima, consultarlo antes de guardar
     if ((lat !== null && lng !== null) && !this.datosClima()) {
       this.mostrarToast('Consultando condiciones climáticas antes de guardar...', 'medium');
       await this.consultarClima(Number(lat), Number(lng));

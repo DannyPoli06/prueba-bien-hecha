@@ -14,7 +14,7 @@ export class WeatherService {
 
   constructor() {}
 
-  // R4: Consultar el clima externo pasando coordenadas GPS
+
   getClima(lat: number, lng: number): Observable<DatosClima | null> {
     const params = new HttpParams()
       .set('latitude', lat.toString())
@@ -45,12 +45,11 @@ export class WeatherService {
           temperatura,
           precipitacion: precipitacionUltimaHora,
           condicion,
-          advertenciaLluvia: precipitacionUltimaHora > 5 // R4: Advertencia si es > 5mm
+          advertenciaLluvia: precipitacionUltimaHora > 5 
         };
       }),
       catchError(error => {
         console.error('Error al consultar el servicio de clima:', error);
-        // R4: Si el servicio falla, devolvemos null para informar al inspector sin bloquear el flujo
         return of(null);
       })
     );

@@ -9,13 +9,13 @@ export class SeguimientoService {
 
   constructor() {}
 
-  // R1: Obtener la lista de IDs de incidencias guardadas en el teléfono
+  // Obtener la lista de IDs de incidencias guardadas en el teléfono
   async getSeguimientoIds(): Promise<string[]> {
     const { value } = await Preferences.get({ key: this.STORAGE_KEY });
     return value ? JSON.parse(value) : [];
   }
 
-  // R1: Marcar una incidencia para seguimiento local
+  // Marcar una incidencia 
   async agregarSeguimiento(id: string): Promise<void> {
     const ids = await this.getSeguimientoIds();
     if (!ids.includes(id)) {
@@ -27,7 +27,7 @@ export class SeguimientoService {
     }
   }
 
-  // R1: Desmarcar una incidencia del seguimiento local
+  // Desmarcar una incidencia del seguimiento local
   async removerSeguimiento(id: string): Promise<void> {
     let ids = await this.getSeguimientoIds();
     ids = ids.filter(item => item !== id);
