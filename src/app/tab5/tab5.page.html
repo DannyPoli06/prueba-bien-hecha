@@ -1,0 +1,137 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="danger">
+    <ion-title>Inicio de Sesión</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding login-container">
+  <ion-header collapse="condense">
+    <ion-toolbar color="danger">
+      <ion-title size="large">Inicio de Sesión</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Si el usuario YA inicio sesion -->
+  @if (authService.isLoggedIn()) {
+    <div class="user-card-wrapper animate-fade">
+      <ion-card class="profile-card">
+        <ion-card-header>
+          <div class="avatar-container">
+            <ion-icon name="person-circle" class="avatar-icon"></ion-icon>
+          </div>
+          <ion-card-title class="ion-text-center">Bienvenido</ion-card-title>
+          <ion-card-subtitle class="ion-text-center status-badge">
+            <ion-icon name="checkmark-circle"></ion-icon> Conectado con Firebase
+          </ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          <ion-item lines="none" class="info-item">
+            <ion-icon name="mail-outline" slot="start" color="danger"></ion-icon>
+            <ion-label>
+              <h3>Correo Electrónico</h3>
+              <p>{{ authService.currentUser()?.email }}</p>
+            </ion-label>
+          </ion-item>
+
+          <ion-item lines="none" class="info-item">
+            <ion-icon name="key-outline" slot="start" color="danger"></ion-icon>
+            <ion-label>
+              <h3>ID de Usuario (Firebase)</h3>
+              <p class="uid-text">{{ authService.currentUser()?.uid }}</p>
+            </ion-label>
+          </ion-item>
+
+          <div class="ion-padding-top">
+            <ion-button expand="block" color="danger" (click)="cerrarSesion()" class="logout-btn">
+              <ion-icon name="log-out-outline" slot="start"></ion-icon>
+              Cerrar Sesión
+            </ion-button>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  } @else {
+    <!-- Formulario de inicio de sesion / registro -->
+    <div class="form-wrapper animate-fade">
+      <ion-card class="auth-card">
+        <ion-card-header class="ion-text-center">
+          <div class="logo-circle">
+            <ion-icon name="lock-closed" class="lock-icon"></ion-icon>
+          </div>
+          <ion-card-title class="auth-title">Acceso al Sistema</ion-card-title>
+          <ion-card-subtitle>Reportes Quito - Incidencias</ion-card-subtitle>
+        </ion-card-header>
+
+        <ion-card-content>
+          @if (mensajeError) {
+            <div class="error-banner">
+              <ion-icon name="alert-circle-outline"></ion-icon>
+              <span>{{ mensajeError }}</span>
+            </div>
+          }
+
+          @if (mensajeExito) {
+            <div class="success-banner">
+              <ion-icon name="checkmark-circle-outline"></ion-icon>
+              <span>{{ mensajeExito }}</span>
+            </div>
+          }
+
+          <ion-item lines="full" class="input-item">
+            <ion-icon name="mail-outline" slot="start" color="danger"></ion-icon>
+            <ion-label position="floating">Correo Electrónico</ion-label>
+            <ion-input 
+              type="email" 
+              placeholder="ejemplo@correo.com" 
+              [(ngModel)]="email"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <ion-item lines="full" class="input-item">
+            <ion-icon name="lock-closed-outline" slot="start" color="danger"></ion-icon>
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input 
+              type="password" 
+              placeholder="Mínimo 6 caracteres" 
+              [(ngModel)]="password"
+              required>
+            </ion-input>
+          </ion-item>
+
+          <div class="btn-group ion-padding-top">
+            <ion-button 
+              expand="block" 
+              color="danger" 
+              (click)="iniciarSesion()" 
+              [disabled]="cargando"
+              class="submit-btn">
+              @if (cargando) {
+                <ion-spinner name="crescent"></ion-spinner>
+              } @else {
+                <ion-icon name="log-in-outline" slot="start"></ion-icon>
+                Iniciar Sesión
+              }
+            </ion-button>
+
+            <ion-button 
+              expand="block" 
+              fill="outline" 
+              color="danger" 
+              (click)="registrarse()" 
+              [disabled]="cargando"
+              class="register-btn">
+              <ion-icon name="person-add-outline" slot="start"></ion-icon>
+              Registrarse
+            </ion-button>
+          </div>
+
+          <p class="footer-note ion-text-center">
+            Autenticación conectada a Firebase <strong>incidencias-LOGIN</strong>
+          </p>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  }
+</ion-content>

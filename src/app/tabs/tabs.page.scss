@@ -26,5 +26,34 @@ ion-tab-bar {
         transform: scale(1.08);
       }
     }
+
+    // Boton de Login resaltado en color ROJO para diferenciarlo
+    &.tab-login {
+      --color: #f87171;
+      --color-selected: #ef4444;
+
+      ion-icon {
+        color: #ef4444;
+      }
+
+      ion-label {
+        color: #f87171;
+      }
+
+      &.tab-selected {
+        --color-selected: #ef4444;
+
+        ion-label {
+          color: #ef4444;
+          font-weight: 900;
+        }
+
+        ion-icon {
+          color: #ef4444;
+          transform: scale(1.15);
+          filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6));
+        }
+      }
+    }
   }
 }
